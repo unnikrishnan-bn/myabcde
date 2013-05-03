@@ -1,0 +1,8 @@
+/* Put your custom CSS here */
+.ui-li-thumb, .ui-li-icon {
+    left: 7px;
+    max-height: 64px; <-- height
+    max-width: 64px; <-- width
+    position: absolute;
+    top: 5px;
+}

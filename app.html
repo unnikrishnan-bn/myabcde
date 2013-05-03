@@ -1,0 +1,1328 @@
+  <!DOCTYPE html>
+  <html>
+      <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+          <title>
+          </title>
+          <link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+          
+           <link rel="stylesheet" type="text/css" href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />
+          <link rel="stylesheet" type="text/css" href="jqm-datebox.min.css" /> 
+             <link href="layout.css" rel="stylesheet" type="text/css"></link>
+          <link rel="stylesheet" href="my.css" />
+          <script type="text/javascript" charset="utf-8" src="cordova-2.2.0.js"></script>
+      
+          
+     
+  
+  
+
+  <script type="text/javascript" src="jquery-1.7.1.min.js"></script> 
+  <script type="text/javascript" src="mobile-jqm.js"></script>
+  <script type="text/javascript" src="jquery.mobile.min.js"></script>
+  
+  <!-- Optional Mousewheel support: http://brandonaaron.net/code/mousewheel/docs -->
+  
+  
+  <script type="text/javascript" src="jqm-datebox.core.min.js"></script>
+  <script type="text/javascript" src="jqm-datebox-1.1.0.mode.flipbox.js"></script>
+  <script type="text/javascript" src="jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
+  <script type="text/javascript" src="jqm-datebox.mode.customflip.min.js"></script>
+  
+  <script type="text/javascript" src="excanvas.min.js"></script>        
+    <script src="jquery.validate.js"></script>
+ 
+        
+     <script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+   
+
+         
+          <!-- User-generated css -->
+          <style>
+          </style>
+           <style type="text/css">
+    .myChart {
+      width: 220px;
+      height: 170px;
+    }
+  </style>
+          <!-- User-generated js -->
+          <script type="text/javascript">
+        function onDeviceReady() {
+		
+             $(document).one ('pageshow', function (e, data) {
+        if ($.mobile.activePage.attr('id') == 'home') {
+            document.addEventListener("backbutton", function () { 
+			console.log('going to exit');
+                setTimeout( function() {navigator.app.exitApp();}, 100 );
+            }, true);
+        }
+       /* else  if ($.mobile.activePage.attr('id') == 'add_expense') {
+            document.addEventListener("backbutton", function () { 
+                setTimeout( function() {$.mobile.changePage("#expenses_page_day");}, 100 );
+            }, true);
+        }*/
+        else{
+            document.addEventListener("backbutton", function () {
+				console.log('going to home');
+				
+                setTimeout( function() {$.mobile.changePage("#home");}, 100 );
+            }, true);
+        }
+    });
+
+        }
+
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+		  </script>
+		  <script>
+		  
+              try {
+  
+      $(function() {
+  		var db0 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		db0.transaction (function (transaction) 
+  { 
+    var sqll = "CREATE TABLE IF NOT EXISTS category " +
+        " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+        "cat VARCHAR(15) NOT NULL)";
+		
+    transaction.executeSql (sqll, []); 
+	
+	 //alert ("Table created1212");
+	 
+  })
+	
+	db0.transaction (function (transaction) {
+		
+		 var sql12 = "SELECT * FROM category ";
+    transaction.executeSql (sql12, undefined, 
+    function (transaction, result)
+    {
+		
+      //console.log(result.rows.length);
+      if (result.rows.length===0)
+      { var catarr = ["Bills","Food","Stationary", "Others"];
+	 for(i=0; i< catarr.length;i++){
+ 
+    var sqll3 = "INSERT INTO category (cat) VALUES (?)";
+    transaction.executeSql (sqll3, [catarr[i]], function ()
+    { 
+     
+	}
+	 
+	)}	
+	  }})
+	})
+	  })
+			  
+    } catch (error) {
+      console.error("Your javascript has an error: " + error);
+    }
+          </script>
+          
+          
+           <script>
+		  
+		function loadExpenses(){
+		 var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		// document.addEventListener("backbutton", onBackKey, false);
+  			console.log('load exp');
+			db2.transaction (function (transaction) 
+  { 
+  	
+  	var param1 = new Date();
+	var date = param1.getDate();
+	var month =  '0' + (param1.getMonth()+1);
+	var year =   param1.getFullYear();
+	var totexp='0';
+	//var parsedDate = $.datepicker.parseDate('yy-mm-dd', current_date);
+	$('#defflip').datebox('setTheDate',param1);
+	$('#defflip').trigger('datebox', {'method':'doset'});
+	
+    var sql5 = "SELECT * FROM expenses where date='"+ date +"' AND month='"+month+"' AND year='" +year+"'";
+    transaction.executeSql (sql5, undefined, 
+    function (transaction, result)
+    {
+    //  console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var restime = row.time;
+		  var resid = row.id;
+		  var temprestime = restime.split(':');
+			 var hours = temprestime[0];
+  var minutes = temprestime[1];
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+   totexp = parseInt(totexp) + parseInt(row.amount);
+		 
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+strTime+"</p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+		totexp = '0';
+      }
+      
+	// alert (html);
+	  $('#day_list').empty();
+	   $('#totalexpenses').text(' Total Expenses Rs. ' + totexp);
+	   
+		 $('#day_list').append(html).listview('refresh');
+		 $.mobile.changePage("#expenses_page_day");
+      html="";
+ 		
+    totexp='0';
+      
+    });
+	 
+  })
+	
+		
+			
+		}
+		
+			
+		</script>
+       
+             
+      </head>
+      <body>
+          <!-- Home -->
+          <div data-role="page" id="home">
+      <!--    <script type="text/javascript">
+		  function addBkBtn(){
+   document.addEventListener("backbutton", homeBackKeyDown, true);
+		  }
+</script>
+<script>
+function homeBackKeyDown() {
+alert('Exit');
+navigator.app.exitApp();
+}
+</script> -->
+              <div data-theme="b" data-role="header" data-position="fixed" style="height:48px">
+                 <img src="img/ExpenseTracker.png" alt="Header" class="ui-btn-left" style=" width:48px; height:48px; display:inline"/> <h2 style="margin-top:16px">
+                      Expense Tracker
+                  </h2>
+              </div>
+              <div data-role="content">
+                  <ul data-role="listview" data-divider-theme="b" data-inset="true">
+                      <li data-theme="c">
+                          <a href="#expenses_page_day" data-transition="slide"><img src="img/expense-48px.png" alt="Expenses" class="ui-li-thumb">
+                              <h3 style="text-align:start; margin-top:20px;" >Expenses</h3>
+                          </a>
+                      </li>
+                      <li data-theme="c">
+                          <a href="#charts" data-transition="slide" ><img src="img/Chart.png" alt="Chart" class="ui-li-thumb" >
+                            <h3 style="text-align:start; margin-top:20px;" >  Charts</h3>
+                          </a>
+                      </li>
+                      <li data-theme="c">
+                          <a href="#settings_page" data-transition="slide"><img src="img/Setting-icon.png" alt="Settings" class="ui-li-thumb" >
+                             <h3 style="text-align:start; margin-top:20px;" >  Settings </h3>
+                          </a>
+                      </li> 
+                      <li data-theme="c">
+                          <a href="#help" data-transition="slide"> <img src="img/help.png" alt="Help" class="ui-li-thumb" >
+                        <h3 style="text-align:start; margin-top:20px;" >   Help </h3>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+          
+          <!--- Home page end  -->
+          
+            <!-- Help Page -->
+          <div data-role="page" id="help">
+              <div data-theme="b" data-role="header" data-position="fixed">
+                  <h3>
+                      Help
+                  </h3>
+              </div>
+              <div data-role="content">
+                  <p align="justify">
+                  This application keeps track of your all expenses. It will give you a detailed report of all your expenses.
+                  
+                  </p>
+              </div>
+          </div>
+          
+          <!--- Help page end  -->
+          <!-- Expenses Page - Day-->
+  <div data-role="page" id="expenses_page_day">
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+          <a data-role="button"  href="#add_expense" data-icon="plus"
+          data-iconpos="right" class="ui-btn-right">
+              Add
+          </a>
+          <h3>
+              Expenses
+          </h3>
+      </div>
+      <div data-role="content">
+     
+      
+<!--  
+  <div data-role="fieldcontain">
+    <label for="cf">Custom</label>
+    <input name="cf" type="date" data-role="datebox" id="cf" data-options='{"mode": "customflip"}' />
+  </div> -->
+ 
+            
+        <div > <input name="defflip" type="date" data-role="datebox" id="defflip" data-mini="true" data-options='{"mode": "flipbox","themeHeader": "b", "themeDatePick": "b", "closeCallback":"linkedCheckin", "overrideDateFormat":"%d/ %B /%Y"}' data-theme="b" placeholder="Date Input" /> </div>
+        <script>
+     
+	 
+        
+        $('#expenses_page_day').live('pagecreate', function(e) {
+ 
+    	loadExpenses();
+	
+ 
+});
+        </script>
+        
+            
+     <div data-role="content">
+     <ul data-role="listview" name="day_list" id="day_list" data-split-icon="delete" data-split-theme="d" data-inset="true">
+     </ul>
+     </div>
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+       <p id="totalexpenses" style="margin-left:5px" >Total Expenses : Rs. 0 </p>
+          <div data-role="navbar">
+          <ul>
+             <li><a href="#expenses_page_day" class="ui-btn-active ui-state-persist" onClick="loadExpenses()">Day</a></li>
+              <li><a href="#expenses_page_month" class="ui-btn-active ui-state-persist" onClick="loadMonthExpenses()">Month</a></li>
+              <li><a href="#expenses_page_year" class="ui-btn-active ui-state-persist" onClick="loadYearExpenses()">Year</a></li>
+          </ul>
+          
+          </div>
+    
+      </div>
+      <div data-role="popup" id="delete_item" data-theme="d" data-overlay-theme="b" class="ui-content" style="max-width:340px; padding-bottom:2em;">
+					<h3>Delete Item</h3>
+					<p>Are you sure, you want to delete this item ? </p>
+					<a  data-role="button" id="delete_item_btn" data-rel="back" data-theme="b" data-icon="check" data-inline="true" data-mini="true" onClick="loadExpenses()">Delete</a>
+					<a action="#expenses_page_day" data-role="button" data-rel="back" data-inline="true" data-mini="true">Cancel</a>	
+				</div> 
+  </div>
+  </div>
+  
+  <!-- End expenses page - Day-->
+  
+          <!-- Expenses Page - Month-->
+  <div data-role="page" id="expenses_page_month" >
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+          <a data-role="button"  href="#add_expense" data-icon="plus"
+          data-iconpos="right" class="ui-btn-right">
+              Add
+          </a>
+          <h3>
+              Expenses
+          </h3>
+      </div>
+      <div data-role="content">
+      
+
+            
+        <div > <input name="datepicker_month" type="date" data-role="datebox" id="datepicker_month" data-mini="true" data-options='{"mode": "flipbox","themeHeader": "b", "themeDatePick": "b", "closeCallback":"linkedmonth", "overrideDateFormat":"%B /%Y", "overrideDateFieldOrder": ["m", "y"]}' data-theme="b" placeholder="Month Input"/> </div>
+            
+     <div data-role="content">
+     <ul data-role="listview" name="month_list" id="month_list" data-split-icon="delete" data-split-theme="d" data-inset="true">
+     </ul>
+     </div>
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+       <p id="totalmonthexpenses" style="margin-left:5px">Total Expenses : Rs. 0 </p>
+          <div data-role="navbar">
+          <ul>
+             <li><a href="#expenses_page_day" class="ui-btn-active ui-state-persist" onClick="loadExpenses()" >Day</a></li>
+              <li><a href="#expenses_page_month" class="ui-btn-active ui-state-persist" onClick="loadMonthExpenses()">Month</a></li>
+              <li><a href="#expenses_page_year" class="ui-btn-active ui-state-persist" onClick="loadYearExpenses() ">Year</a></li>
+          </ul>
+          </div>
+      </div>
+      <div data-role="popup" id="delete_item" data-theme="d" data-overlay-theme="b" class="ui-content" style="max-width:340px; padding-bottom:2em;">
+					<h3>Delete Item</h3>
+					<p>Are you sure, you want to delete this item ? </p>
+					<a  data-role="button" id="delete_item_month_btn" data-rel="back" data-theme="b" data-icon="check" data-inline="true" data-mini="true" onClick="loadMonthExpenses()">Delete</a>
+					<a action="#expenses_page_month" data-role="button" data-rel="back" data-inline="true" data-mini="true">Cancel</a>	
+				</div> 
+  </div>
+  </div>
+  
+  <!-- End expenses page Month-->
+  
+       <!-- Expenses Page - Year-->
+  <div data-role="page" id="expenses_page_year" >
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+          <a data-role="button"  href="#add_expense" data-icon="plus"
+          data-iconpos="right" class="ui-btn-right">
+              Add
+          </a>
+          <h3>
+              Expenses
+          </h3>
+      </div>
+      <div data-role="content">
+      
+
+            
+        <div > <input name="datepicker_year" type="date" data-role="datebox" id="datepicker_year" data-mini="true" data-options='{"mode": "flipbox","themeHeader": "b", "themeDatePick": "b", "closeCallback":"linkedyear", "overrideDateFormat":"%Y", "overrideDateFieldOrder": ["y"]}' data-theme="b" placeholder="Year Input"/> </div>
+            
+     <div data-role="content">
+     <ul data-role="listview" name="year_list" id="year_list" data-split-icon="delete" data-split-theme="d" data-inset="true">
+     </ul>
+     </div>
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+       <p id="totalyearexpenses" style="margin-left:5px" >Total Expenses : Rs. 0 </p>
+          <div data-role="navbar">
+          <ul>
+              <li><a href="#expenses_page_day" class="ui-btn-active ui-state-persist" onClick="loadExpenses()">Day</a></li>
+              <li><a href="#expenses_page_month" class="ui-btn-active ui-state-persist" onClick="loadMonthExpenses()">Month</a></li>
+              <li><a href="#expenses_page_year" class="ui-btn-active ui-state-persist" onClick="loadYearExpenses()">Year</a></li>
+          </ul>
+          </div>
+      </div>
+      <div data-role="popup" id="delete_item" data-theme="d" data-overlay-theme="b" class="ui-content" style="max-width:340px; padding-bottom:2em;">
+					<h3>Delete Item</h3>
+					<p>Are you sure, you want to delete this item ? </p>
+					<a  data-role="button" id="delete_item_year_btn" data-rel="back" data-theme="b" data-icon="check" data-inline="true" data-mini="true" onClick="loadYearExpenses()">Delete</a>
+					<a action="#expenses_page_year" data-role="button" data-rel="back" data-inline="true" data-mini="true">Cancel</a>	
+				</div> 
+  </div>
+  </div>
+  
+  <!-- End expenses page Year-->
+  
+  
+            <!-- Add Expense -->
+          <div data-role="page" id="add_expense">
+              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+                  <h3>
+                      Add Expense
+                  </h3>
+              </div>
+              <div data-role="content">
+            <!--    <script type="text/javascript">
+   document.addEventListener("backbutton", addExpBackKeyDown, true);
+</script>
+<script>
+function addExpBackKeyDown() {
+alert('Add Exp BAck btn');
+$.mobile.changePage("#expenses_page_day");
+}
+</script> -->
+                  <form id="addExpenseForm" action="#expenses_page_day">
+                      <div data-role="fieldcontain">
+                          <label for="categorySel">
+                              Category:
+                          </label>
+                          <select name="categorySel" id="categorySel">
+                           
+                          </select>
+                          
+                          <script>
+                          var ddl = $("#categorySel"); 
+						var db0 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+						    db0.transaction (function (transaction) {
+		
+		 var sql12 = "SELECT * FROM category ";
+    transaction.executeSql (sql12, undefined, 
+    function (transaction, result)
+    {
+		
+     //	 console.log(result.rows.length);
+      if (result.rows.length)
+      { 
+	 for(i=0; i< result.rows.length;i++){
+ 		 var row3 = result.rows.item (i);
+	
+   ddl.append("<option value='" + row3.cat+ "'>" + row3.cat + "</option>");
+	 }
+	  }
+	})
+	})
+							
+                          </script>
+                      </div>
+                      <div data-role="fieldcontain">
+                          <label for="amount">
+                              Amount (in Rs.)*:
+                          </label>
+                          <input name="amount" id="amount" placeholder="" value="" />
+                      </div>
+                      <div data-role="fieldcontain">
+                          <label for="paymodeSel">
+                              Pay Mode:
+                          </label>
+                          <select id="paymodeSel" name="paymodeSel">
+                              <option value="cash">
+                                  Cash
+                              </option>
+                              <option value="cheque">
+                                  Cheque
+                              </option>
+                              <option value="ddraft">
+                                  Demand Draft
+                              </option>
+                              <option value="otransfer">
+                                  Online Transfer
+                              </option>
+                          </select>
+                      </div>
+                      <div data-role="fieldcontain">
+                          <label for="remarkTxt">
+                              Remark
+                          </label>
+                          <textarea name="remarkTxt" id="remarkTxt"></textarea>
+                      </div>
+                      <input type="submit" data-inline="true" data-icon="check" data-iconpos="right" value="Submit" id="submitExpense" name="submitExpense"/>
+                      <a data-role="button" data-inline="true" href="#expenses_page_day" data-icon="delete" data-iconpos="right">
+                          Cancel
+                      </a>
+                  </form>
+              </div>
+          </div>
+          <!--  Add Expense End -->
+  
+  
+  
+  <!--  Charts Page -->
+   <div data-role="page" id="charts" >
+      <div id="chartsHdr" data-id="chartsHdr" data-theme="b" data-role="header" data-position="fixed">
+          <h3>
+              Charts
+          </h3>
+      </div> 
+ 
+            <style>
+			h5
+{
+  width:50px;
+  height:40px;
+  -ms-transform:rotate(270deg); /* IE 9 */
+  -moz-transform:rotate(270deg); /* Firefox */
+  -webkit-transform:rotate(270deg); /* Safari and Chrome */
+  -o-transform:rotate(270deg); /* Opera */
+}
+			
+			</style>
+     
+        <script>
+              $('#charts').live('pagecreate', function(e) {
+ 
+    	
+		loadChart();
+ 
+		});
+
+        </script>
+  
+     <section data-role="content">
+    
+     
+     <table style="text-align:center">
+  <tr>
+    <td></td>
+
+    <td> <h3> Total expenses Per Year </h3></td>
+
+    <td> </td>
+  </tr>
+
+  <tr>
+    <td><h5>Expenses in Rs.</h5></td>
+
+    <td>
+      <div id="barChart" class="myChart" style="height: 300px; min-width: 100px"></div>
+    </td>
+
+    <td></td>
+  </tr>
+
+  <tr>
+    <td></td>
+
+    <td>Years</td>
+
+    <td></td>
+  </tr>
+
+</table>
+     
+     
+     
+     
+			
+			
+<script id="source" language="javascript" type="text/javascript">
+</script>
+
+     </section>
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+         
+      </div>
+     
+
+  </div>
+  <!-- Charts Page End -->
+  
+  <!--  Settings Page -->
+   <div data-role="page" id="settings_page" >
+      <div id="setingsHdr" data-id="settingsHdr" data-theme="b" data-role="header" data-position="fixed">
+          <h3>
+              Settings
+          </h3>
+      </div> 
+ 
+            
+     
+     <div data-role="content">
+      
+     <ul data-role="listview" name="settings_list" id="settings_list"  data-inset="true">
+      <li data-theme="c">
+                          <a href="#catagories_list" data-transition="slide">
+                              Catagories
+                          </a>
+                      </li>
+     </ul>
+     </div>
+		
+
+     
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+         
+      </div>
+     
+
+  </div>
+  
+  <!--Settings Page End  -->
+  
+   <!-- Catagories List-->
+  <div data-role="page" id="catagories_list" >
+      <div id="catHdr" data-id="catHdr" data-theme="b" data-role="header" data-position="fixed">
+          <a data-role="button"  href="#add_category_item" data-icon="plus"
+          data-iconpos="right" class="ui-btn-right">
+              Add
+          </a>
+          <h3>
+              Catagories
+          </h3>
+      </div>
+        
+
+            
+        
+            
+     <div data-role="content">
+     
+     
+     <ul data-role="listview" name="cat_list" id="cat_list" data-split-icon="delete" data-split-theme="d" data-inset="true">
+     </ul>
+     
+     <script>
+	  var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+	 $(function () {
+         
+		db2.transaction (function (transaction) 
+  { 
+   var sql12 = "SELECT * FROM category ";
+   var html5="";
+    transaction.executeSql (sql12, undefined, 
+    function (transaction, result)
+    {
+		
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      { 
+	 for(i=0; i< result.rows.length;i++){
+ 		 var row = result.rows.item (i);
+	
+    html5 += "<li id=\""+ row.cat +"\" data-name=\"" +row.cat+"\" > <a> <h3>" +row.cat+ "</h3></a>" + 
+		  " <a href=\"#delete_item_cat\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +row.cat+ "\">Delete</a></li>";
+	 }
+	  }
+	
+	
+      else
+      {
+        html5 += "<li> No Expenses</li>";
+      }
+      
+	 
+	 
+	  $('#cat_list').empty();
+		 $('#cat_list').append(html5).listview('refresh');
+		 
+        html5="";
+    });
+	 
+  })
+	 })
+           </script> 
+     </div>
+       <div data-theme="b" data-role="footer" data-position="fixed" data-id="expensefooter">
+      </div>
+      <div data-role="popup" id="delete_item_cat" data-theme="d" data-overlay-theme="b" class="ui-content" style="max-width:340px; padding-bottom:2em;">
+					<h3>Delete Item</h3>
+					<p>Are you sure, you want to delete this catagory ? </p>
+					<a  data-role="button" id="delete_item_cat_btn" data-rel="back" data-theme="b" data-icon="check" data-inline="true" data-mini="true">Delete</a>
+					<a action="#catagories_list" data-role="button" data-rel="back" data-inline="true" data-mini="true">Cancel</a>	
+				</div> 
+  </div>
+  </div>
+  
+  <!-- End Categories Page-->
+  
+    <!-- Add Category -->
+          <div data-role="page" id="add_category_item">
+              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+                  <h3>
+                      Add Category
+                  </h3>
+              </div>
+              <div data-role="content">
+                  <form id="addCategoryForm" action="#catagories_list">
+                      <div data-role="fieldcontain">
+                          <label for="cat">
+                              New Category* :
+                          </label>
+                          <input name="new_cat" id="new_cat" placeholder="" value="" type="text" class="required"/>
+                      </div>
+                      <input type="submit" data-inline="true" data-icon="check" data-iconpos="right" value="Submit" id="submitNewCat" name="submitNewCat"/>
+                      <a data-role="button" data-inline="true" href="#catagories_list" data-icon="delete" data-iconpos="right">
+                          Cancel
+                      </a>
+                  </form>
+              </div>
+          </div>
+          <!--  Add Category End -->
+  
+  
+         
+         
+       
+         <script>
+         
+var db = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+var html="";
+var item_name;
+		  $('#addCategoryForm').submit(function() 
+{	
+         
+	db.transaction (function (transaction) { 
+	  var category_New = $("#new_cat").val ();
+  	  var sqll3 = "INSERT INTO category (cat) VALUES (?)";
+	  var html2 ="";
+    transaction.executeSql (sqll3, [category_New], function ()
+    { 
+     
+	   html2 += "<li id=\""+ category_New +"\" data-name=\"" +category_New+"\" > <a> <h3>" +category_New+ "</h3></a>" + 
+		  " <a href=\"#delete_item_cat\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +category_New+ "\">Delete</a></li>";
+ $('#cat_list').append(html2).listview('refresh');
+ html2="";
+   var ddl = $("#categorySel"); 
+ ddl.append("<option value='" +category_New+ "'>" + category_New + "</option>").select('refresh');
+	 $.mobile.changePage("#catagories_list");
+	 $("#new_cat").val('');
+	})
+	
+		
+	})
+	 
+	  
+	return false;
+})
+         </script>
+          
+        <script>
+         
+var db = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+var html="";
+var item_name;
+		  $('#addExpenseForm').submit(function() 
+{	
+
+db.transaction (function (transaction) 
+  { 
+    var sql = "CREATE TABLE IF NOT EXISTS expenses " +
+        " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+        "category VARCHAR(15) NOT NULL, " + 
+        "amount VARCHAR(10) NOT NULL, " +
+		"paymode VARCHAR(15) NOT NULL, " +
+		"remark VARCHAR(50) NOT NULL, " +
+		"date VARCHAR(15) NOT NULL, " +
+		"month VARCHAR(15) NOT NULL, " +
+		"year VARCHAR(15) NOT NULL, " +
+		"time VARCHAR(10) NOT NULL " +
+		 ")";
+		
+    transaction.executeSql (sql, []); 
+	
+	 //alert ("Table created1212");
+	 
+  })
+  
+    var err = false;
+       
+        // Perform form validation
+         
+        if($('#amount').val()==null || $('#amount').val()==''){  
+            alert(err);
+            err = true;
+          }          
+    
+    // Do whatever if it fails.
+
+        
+        
+        // If validation fails, show Dialog content
+        if(err == true){            
+         alert("Fill required fields");
+          return false;
+        }        
+			
+					
+			var testNumber= /^[0-9]+$/;
+			var amnt = $('#amount').val();
+			
+if(!testNumber.test(amnt)){
+alert('Invalid Amount');
+return false;
+
+} else{
+	
+	db.transaction (function (transaction) { 
+	  var category = $("#categorySel").val ();
+  var amount = $("#amount").val ();
+  var paymode = $("#paymodeSel").val ();
+  var remark = $("#remarkTxt").val ();
+  var param1 = new Date();
+	var date = param1.getDate() + "";
+	var month =  "0" + (param1.getMonth()+1);
+	var year =   param1.getFullYear() + "";
+	var time = param1.getHours() + ':' + param1.getMinutes();
+    var sql3 = "INSERT INTO expenses (category, amount, paymode, remark, date,month,year,time) VALUES (?, ?, ?, ? , ?, ?, ?, ?)";
+    transaction.executeSql (sql3, [category, amount, paymode, remark,date,month,year,time], function ()
+    { 
+      
+    });
+	$("#amount").val('');
+	$("#remarkTxt").val('');
+	 
+	loadExpenses(); 
+	
+  });
+  
+}
+ return false;
+})
+function onReadyTransaction( ){
+		console.log( 'Transaction completed' )
+	}
+ 
+	function onSuccessExecuteSql( tx, results ){
+		console.log( 'Execute SQL completed' )
+	}
+ 
+	function onError( err ){
+		console.log( err )
+	}
+          </script> 
+          
+          
+          <script>
+          $("#delete_item_btn").click( function()
+           {
+				db.transaction (function (transaction) 
+  { 
+    var sql4 = "DELETE FROM expenses WHERE id='"+item_name + "'";
+		
+    transaction.executeSql (sql4, []); 
+	 var item2= $("#day_list").find("li[id='" + item_name+"']");
+	 item2.remove();
+   $('#day_list').listview('refresh');
+  });
+  sql4 =""
+           }
+      );
+          
+ $('#day_list').on('click','li',function () {
+   
+   item_name= $(this).attr('data-name');
+   
+});
+          </script>
+   
+    <script>
+          $("#delete_item_month_btn").click( function()
+           {
+				db.transaction (function (transaction) 
+  { 
+    var sql4 = "DELETE FROM expenses WHERE id='"+item_name + "'";
+		
+    transaction.executeSql (sql4, []); 
+	 var item2= $("#month_list").find("li[id='" + item_name+"']");
+	 item2.remove();
+   
+  });
+  sql4 =""
+           }
+      );
+          
+ $('#month_list').on('click','li',function () {
+   
+   item_name= $(this).attr('data-name');
+   
+});
+          </script>
+          
+             <script>
+          $("#delete_item_year_btn").click( function()
+           {
+				db.transaction (function (transaction) 
+  { 
+    var sql4 = "DELETE FROM expenses WHERE id='"+item_name + "'";
+		
+    transaction.executeSql (sql4, []); 
+	 var item2= $("#year_list").find("li[id='" + item_name+"']");
+	 item2.remove();
+   
+  });
+  sql4 =""
+           }
+      );
+          
+ $('#year_list').on('click','li',function () {
+   
+   item_name= $(this).attr('data-name');
+   
+});
+          </script>
+          
+          <script>
+		   $('#cat_list').on('click','li',function () {
+   
+   item_name= $(this).attr('data-name');
+   
+});
+          $("#delete_item_cat_btn").click( function()
+           {
+				db.transaction (function (transaction) 
+  { 
+    var sql4 = "DELETE FROM category WHERE cat='"+item_name + "'";
+		
+    transaction.executeSql (sql4, []); 
+	 var item2= $("#cat_list").find("li[id='" + item_name+"']");
+	 item2.remove();
+   $('#cat_list').listview('refresh');
+  });
+           }
+      );
+          
+
+          </script>
+        <script>
+		 function onBackKey() {
+      //  console.log("I've caught a back key");
+			//alert('Back Button!');
+        // We are going back to home so remove the event listener 
+        // so the default back key behaviour will take over
+		//$.mobile.changePage("#home");
+       // document.removeEventListener("backbutton", onBackKey, false);
+		 }
+		</script>
+        
+        <script>
+		function loadMonthExpenses(){
+		 var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		 // document.addEventListener("backbutton", onBackKey, false);
+  			
+			db2.transaction (function (transaction) 
+  { 
+  	var param1 = new Date();
+	var date = param1.getDate();
+	var month =  '0' + (param1.getMonth()+1);
+	var year =   param1.getFullYear();
+	var totexp='0';
+	//var parsedDate = $.datepicker.parseDate('yy-mm-dd', current_date);
+	$('#datepicker_month').datebox('setTheDate',param1);
+	$('#datepicker_month').trigger('datebox', {'method':'doset'});
+    var sql5 = "SELECT * FROM expenses where month='"+month+"' AND year='" +year+"'";
+    transaction.executeSql (sql5, undefined, 
+    function (transaction, result)
+    {
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var restime = row.time;
+		  var resid = row.id;
+		  var temprestime = restime.split(':');
+			 var hours = temprestime[0];
+  var minutes = temprestime[1];
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+   totexp = parseInt(totexp) + parseInt(row.amount);
+		var fullDate = row.date +'/' + row.month + '/'+row.year; 
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+fullDate+"</p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+		totexp = '0';
+      }
+      
+	// alert (html);
+	  $('#month_list').empty();
+	   $('#totalmonthexpenses').text(' Total Expenses Rs. ' + totexp);
+	  // console.log(totexp);
+		 $('#month_list').append(html).listview('refresh');
+      html="";
+ 		
+    totexp='0';
+      
+    });
+	 
+  })
+	
+			
+			
+		}
+		
+		</script>
+        
+          <script>
+		function loadYearExpenses(){
+		 var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		  //document.addEventListener("backbutton", onBackKey, false);
+  			
+			db2.transaction (function (transaction) 
+  { 
+  	var param1 = new Date();
+	var date = param1.getDate();
+	var month =  '0' + (param1.getMonth()+1);
+	var year =   param1.getFullYear();
+	var totexp='0';
+	//var parsedDate = $.datepicker.parseDate('yy-mm-dd', current_date);
+	$('#datepicker_year').datebox('setTheDate',param1);
+	$('#datepicker_year').trigger('datebox', {'method':'doset'});
+    var sql5 = "SELECT * FROM expenses where year='" +year+"'";
+    transaction.executeSql (sql5, undefined, 
+    function (transaction, result)
+    {
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var restime = row.time;
+		  var resid = row.id;
+		  var temprestime = restime.split(':');
+			 var hours = temprestime[0];
+  var minutes = temprestime[1];
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+   totexp = parseInt(totexp) + parseInt(row.amount);
+   var fullDate = row.date +'/' + (row.month) + '/'+row.year;
+		 
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\">"+fullDate+"<p></p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+		totexp = '0';
+      }
+      
+	// alert (html);
+	  $('#year_list').empty();
+	   $('#totalyearexpenses').text(' Total Expenses Rs. ' + totexp);
+	   //console.log(totexp);
+		 $('#year_list').append(html).listview('refresh');
+      html="";
+ 		
+    totexp='0';
+      
+    });
+	 
+  })
+	
+			
+			
+		}
+		
+		</script>
+              
+        
+          
+          <script>
+		  var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		 
+linkedCheckin = function (date, name) {
+	
+		db2.transaction (function (transaction) 
+  { 
+  	var param1 = new Date();
+  	var current_date = param1.getDate() + '/' + param1.getMonth() + '/' + param1.getFullYear();
+	//var parsedDate = $.datepicker.parseDate('yy-mm-dd', current_date);
+	//$('#defflip').datebox('setTheDate',param1);
+	//$('#defflip').trigger('datebox', {'method':'doset'});
+	var getdate = $('#defflip').val();
+	var arrDate = getdate.split('/');
+    var sql5 = "SELECT * FROM expenses where date='"+ arrDate[0] +"' AND month='"+arrDate[1]+"' AND year='" +arrDate[2]+"'";
+	//console.log(sql5);
+	var totexp = '0';
+    transaction.executeSql (sql5, undefined, 
+    function (transaction, result)
+    {
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var restime = row.time;
+		  var resid = row.id;
+  var temprestime = restime.split(':');
+			 var hours = temprestime[0];
+  var minutes = temprestime[1];
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+		   totexp = parseInt(totexp) + parseInt(row.amount);
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+strTime+"</p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+		totexp='0';
+      }
+      
+	// alert (html);
+	  $('#day_list').empty();
+	   $('#totalexpenses').text('Total Expenses Rs. ' + totexp);
+	 //  console.log(totexp);
+		 $('#day_list').append(html).listview('refresh');
+		 html="";
+      totexp='';
+ 
+    
+      
+    });
+	 
+  })
+	
+	
+}
+
+linkedmonth = function (date, name) {
+	
+		db2.transaction (function (transaction) 
+  { 
+  	var param1 = new Date();
+  	var current_date = param1.getDate() + '/' + param1.getMonth() + '/' + param1.getFullYear();
+	var getdate = $('#datepicker_month').val();
+	var arrDate = getdate.split('/');
+    var sql6 = "SELECT * FROM expenses where month='"+arrDate[0]+"' AND year='" +arrDate[1]+"'";
+	//console.log(sql6);
+    transaction.executeSql (sql6, undefined, 
+    function (transaction, result)
+    {
+      //console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var resmonth = row.month;
+		  var resyear = row.year;
+		  var restime = row.time;
+		  var resid = row.id;
+
+		  
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+resdate+"/" +resmonth+"/" +resyear+"</p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+      }
+      
+	// alert (html);
+	  $('#month_list').empty();
+		 $('#month_list').append(html).listview('refresh');
+		 html="";
+        
+    });
+	 
+  })
+}
+
+
+linkedyear = function (date, name) {
+	
+		db2.transaction (function (transaction) 
+  { 
+  	var param1 = new Date();
+  	var current_date = param1.getDate() + '/' + param1.getMonth() + '/' + param1.getFullYear();
+	var getdate = $('#datepicker_year').val();
+	var arrDate = getdate.split('/');
+    var sql6 = "SELECT * FROM expenses where year='" +arrDate[0]+"'";
+	//console.log(sql6);
+    transaction.executeSql (sql6, undefined, 
+    function (transaction, result)
+    {
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      {
+        for (var i = 0; i < result.rows.length; i++) 
+        {
+          var row = result.rows.item (i);
+          var rescat = row.category;
+          var resamount = row.amount;
+		  var respaymode = row.paymode;
+		  var resremark = row.remark;
+		  var resdate = row.date;
+		  var resmonth = row.month;
+		  var resyear = row.year;
+		  var restime = row.time;
+		  var resid = row.id;
+
+		  
+          html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+resdate+"/" +resmonth+"/" +resyear+"</p></a>" + 
+		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
+        }
+      }
+      else
+      {
+        html += "<li> No Expenses</li>";
+      }
+      
+	// alert (html);
+	  $('#year_list').empty();
+		 $('#year_list').append(html).listview('refresh');
+		 html="";
+        
+    });
+	 
+  })
+}
+		  </script>
+          
+          <script>
+    function loadChart(){
+	//alert('chart loaded');	
+	 var totamt=0;
+  
+$(function () {
+    
+   // for (var i = 0; i < 14; i += 0.5)
+       // d1.push([i, Math.sin(i)]);
+	  
+	  var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
+		db2.transaction (function (transaction) 
+  { 
+  	
+    var sql0 = "SELECT amount, year FROM expenses ";
+    transaction.executeSql (sql0, undefined, 
+    function (transaction, result)
+    {
+     // console.log(result.rows.length);
+      if (result.rows.length)
+      {
+		   for (var i = 0; i < result.rows.length; i++) 
+        {
+			var row = result.rows.item (i);
+			totamt = parseInt(totamt) + parseInt(row.amount);
+			//console.log(totamt);
+		}
+	  
+   //  console.log(totamt);
+    var d2 = [[2011, 0], [2012, 0], [2013,totamt], [2014, 0]];
+
+    // a null signifies separate line segments
+  //  var d3 = [[0, 12], [7, 12], null, [7, 2.5], [12, 2.5]];
+    
+    $.plot($("#barChart"), [ {label: "Total expenses Per Year"},{data : d2,  bars: { show: true, barWidth: 1,
+        align: "center" }}, {
+   xaxis: {
+     ticks: [
+       [1, "2011"],
+       [2, "2012"],
+       [3, "2013"],
+       [4, "2014"],
+	   [5, "2015"]
+     ]  ,  tickOptions: {
+                formatString: '%d'
+            },
+            numberTicks: 4 }}] 
+	
+);
+}
+	})
+  });
+});
+
+	}
+ </script>
+       
+           </body>
+  </html>

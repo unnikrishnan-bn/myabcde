@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<button name = "abc" id="abc" onclick="click1()"/>
+<script>
+var db = openDatabase ("Test", "1.0", "Test", 65535);
+		  function click1() 
+{	
+ alert ("Table created1212");
+db.transaction (function (transaction) 
+  { 
+    var sql = "CREATE TABLE expenses " ;
+  transaction.executeSql (sql, undefined,  function ()
+    { 
+      alert ("Table createdinside");
+    }); 
+	
+	 alert ("Table created1212outside");
+  });
+ 
+ 
+}
+
+</script>
+</body>
+</html>
