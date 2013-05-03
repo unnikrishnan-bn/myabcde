@@ -226,7 +226,7 @@ navigator.app.exitApp();
               <div data-role="content">
                   <ul data-role="listview" data-divider-theme="b" data-inset="true">
                       <li data-theme="c">
-                          <a href="#expenses_page_day" data-transition="slide"><img src="img/expense-48px.png" alt="Expenses" class="ui-li-thumb">
+                          <a href="#expenses_page_day" data-transition="slide"><img src="img/expense48px.png" alt="Expenses" class="ui-li-thumb">
                               <h3 style="text-align:start; margin-top:20px;" >Expenses</h3>
                           </a>
                       </li>
@@ -236,7 +236,7 @@ navigator.app.exitApp();
                           </a>
                       </li>
                       <li data-theme="c">
-                          <a href="#settings_page" data-transition="slide"><img src="img/Setting-icon.png" alt="Settings" class="ui-li-thumb" >
+                          <a href="#settings_page" data-transition="slide"><img src="img/Settingicon.png" alt="Settings" class="ui-li-thumb" >
                              <h3 style="text-align:start; margin-top:20px;" >  Settings </h3>
                           </a>
                       </li> 
@@ -252,8 +252,8 @@ navigator.app.exitApp();
           <!--- Home page end  -->
           
             <!-- Help Page -->
-          <div data-role="page" id="help">
-              <div data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true">
+          <div data-role="page" id="help" data-add-back-btn="true">
+              <div data-theme="b" data-role="header" data-position="fixed">
                   <h3>
                       Help
                   </h3>
@@ -269,12 +269,16 @@ navigator.app.exitApp();
           <!--- Help page end  -->
           <!-- Expenses Page - Day-->
   <div data-role="page" id="expenses_page_day">
-      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
           <a data-role="button"  href="#add_expense" data-icon="plus"
           data-iconpos="right" class="ui-btn-right">
               Add
           </a>
-          <h3 style="margin-top:16px">
+           <a data-role="button"  href="#home" data-icon="arrow-l"
+          data-iconpos="left" class="ui-btn-left">
+              Back
+          </a>
+          <h3>
               Expenses
           </h3>
       </div>
@@ -331,12 +335,17 @@ navigator.app.exitApp();
   
           <!-- Expenses Page - Month-->
   <div data-role="page" id="expenses_page_month" >
-      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
           <a data-role="button"  href="#add_expense" data-icon="plus"
           data-iconpos="right" class="ui-btn-right">
               Add
           </a>
-          <h3 style="margin-top:16px">
+          
+           <a data-role="button"  href="#home" data-icon="arrow-l"
+          data-iconpos="left" class="ui-btn-left">
+              Back
+          </a>
+          <h3>
               Expenses
           </h3>
       </div>
@@ -372,13 +381,17 @@ navigator.app.exitApp();
   <!-- End expenses page Month-->
   
        <!-- Expenses Page - Year-->
-  <div data-role="page" id="expenses_page_year" >
-      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
+  <div data-role="page" id="expenses_page_year">
+      <div id="expensesHdr" data-id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
           <a data-role="button"  href="#add_expense" data-icon="plus"
           data-iconpos="right" class="ui-btn-right">
               Add
           </a>
-          <h3 style="margin-top:16px">
+           <a data-role="button"  href="#home" data-icon="arrow-l"
+          data-iconpos="left" class="ui-btn-left">
+              Back
+          </a>
+          <h3>
               Expenses
           </h3>
       </div>
@@ -415,9 +428,9 @@ navigator.app.exitApp();
   
   
             <!-- Add Expense -->
-          <div data-role="page" id="add_expense">
-              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
-                  <h3 style="margin-top:16px">
+          <div data-role="page" id="add_expense"  data-add-back-btn="true">
+              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+                  <h3>
                       Add Expense
                   </h3>
               </div>
@@ -507,9 +520,9 @@ $.mobile.changePage("#expenses_page_day");
   
   
   <!--  Charts Page -->
-   <div data-role="page" id="charts" >
-      <div id="chartsHdr" data-id="chartsHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
-          <h3 style="margin-top:16px">
+   <div data-role="page" id="charts"  data-add-back-btn="true">
+      <div id="chartsHdr" data-id="chartsHdr" data-theme="b" data-role="header" data-position="fixed">
+          <h3>
               Charts
           </h3>
       </div> 
@@ -587,9 +600,9 @@ $.mobile.changePage("#expenses_page_day");
   <!-- Charts Page End -->
   
   <!--  Settings Page -->
-   <div data-role="page" id="settings_page" >
-      <div id="setingsHdr" data-id="settingsHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
-          <h3 style="margin-top:16px">
+   <div data-role="page" id="settings_page"  data-add-back-btn="true">
+      <div id="setingsHdr" data-id="settingsHdr" data-theme="b" data-role="header" data-position="fixed">
+          <h3>
               Settings
           </h3>
       </div> 
@@ -619,13 +632,17 @@ $.mobile.changePage("#expenses_page_day");
   <!--Settings Page End  -->
   
    <!-- Catagories List-->
-  <div data-role="page" id="catagories_list" >
-      <div id="catHdr" data-id="catHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
+  <div data-role="page" id="catagories_list">
+      <div id="catHdr" data-id="catHdr" data-theme="b" data-role="header" data-position="fixed">
           <a data-role="button"  href="#add_category_item" data-icon="plus"
           data-iconpos="right" class="ui-btn-right">
               Add
           </a>
-          <h3 style="margin-top:16px">
+           <a data-role="button"  href="#settings_page" data-icon="arrow-l"
+          data-iconpos="left" class="ui-btn-left">
+              Back
+          </a>
+          <h3>
               Catagories
           </h3>
       </div>
@@ -696,8 +713,8 @@ $.mobile.changePage("#expenses_page_day");
   
     <!-- Add Category -->
           <div data-role="page" id="add_category_item">
-              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed" data-add-back-btn="true" style="height:48px">
-                  <h3 style="margin-top:16px">
+              <div id="expensesHdr" data-theme="b" data-role="header" data-position="fixed">
+                  <h3>
                       Add Category
                   </h3>
               </div>
