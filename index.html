@@ -29,6 +29,7 @@
   
   <script type="text/javascript" src="jqmdateboxcoremin.js"></script>
   <script type="text/javascript" src="jqmdatebox110modeflipbox.js"></script>
+  
   <script type="text/javascript" src="jquerymobiledateboxi18nenUS.js"></script>
   <script type="text/javascript" src="jqmdateboxmodecustomflipmin.js"></script>
   
@@ -600,8 +601,12 @@ $.mobile.changePage("#expenses_page_day");
   <!-- Charts Page End -->
   
   <!--  Settings Page -->
-   <div data-role="page" id="settings_page"  data-add-back-btn="true">
+   <div data-role="page" id="settings_page" >
       <div id="setingsHdr" data-id="settingsHdr" data-theme="b" data-role="header" data-position="fixed">
+            <a data-role="button"  href="#home" data-icon="arrow-l"
+          data-iconpos="left" class="ui-btn-left">
+              Back
+          </a>
           <h3>
               Settings
           </h3>
@@ -1119,7 +1124,8 @@ function onReadyTransaction( ){
 		  var db2 = window.openDatabase ("Test2", "1.0", "Test2", 65535);
 		 
 linkedCheckin = function (date, name) {
-	
+	console.log('inside...');
+
 		db2.transaction (function (transaction) 
   { 
   	var param1 = new Date();
@@ -1127,8 +1133,9 @@ linkedCheckin = function (date, name) {
 	//var parsedDate = $.datepicker.parseDate('yy-mm-dd', current_date);
 	//$('#defflip').datebox('setTheDate',param1);
 	//$('#defflip').trigger('datebox', {'method':'doset'});
-	var getdate = $('#defflip').val();
+	var getdate = $('#defflip').datebox('callFormat', '%d/%m/%Y', $('#defflip').datebox('getTheDate'));
 	var arrDate = getdate.split('/');
+	arrDate[0] =  parseInt(arrDate[0]); 
     var sql5 = "SELECT * FROM expenses where date='"+ arrDate[0] +"' AND month='"+arrDate[1]+"' AND year='" +arrDate[2]+"'";
 	//console.log(sql5);
 	var totexp = '0';
@@ -1173,7 +1180,7 @@ linkedCheckin = function (date, name) {
 	 //  console.log(totexp);
 		 $('#day_list').append(html).listview('refresh');
 		 html="";
-      totexp='';
+      totexp='0';
  
     
       
@@ -1185,13 +1192,14 @@ linkedCheckin = function (date, name) {
 }
 
 linkedmonth = function (date, name) {
-	
+	var totexp = '0';
 		db2.transaction (function (transaction) 
   { 
   	var param1 = new Date();
   	var current_date = param1.getDate() + '/' + param1.getMonth() + '/' + param1.getFullYear();
-	var getdate = $('#datepicker_month').val();
+	var getdate = $('#datepicker_month').datebox('callFormat', '%m/%Y', $('#datepicker_month').datebox('getTheDate'));
 	var arrDate = getdate.split('/');
+	console.log(getdate);
     var sql6 = "SELECT * FROM expenses where month='"+arrDate[0]+"' AND year='" +arrDate[1]+"'";
 	//console.log(sql6);
     transaction.executeSql (sql6, undefined, 
@@ -1212,7 +1220,7 @@ linkedmonth = function (date, name) {
 		  var resyear = row.year;
 		  var restime = row.time;
 		  var resid = row.id;
-
+		  totexp = parseInt(totexp) + parseInt(row.amount);
 		  
           html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+resdate+"/" +resmonth+"/" +resyear+"</p></a>" + 
 		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
@@ -1221,21 +1229,24 @@ linkedmonth = function (date, name) {
       else
       {
         html += "<li> No Expenses</li>";
+		   $('#totalmonthexpenses').text(' Total Expenses Rs. 0');
       }
       
 	// alert (html);
 	  $('#month_list').empty();
 		 $('#month_list').append(html).listview('refresh');
 		 html="";
-        
+        $('#totalmonthexpenses').text(' Total Expenses Rs. ' + totexp);   
     });
 	 
   })
+  totexp = '0';
 }
 
 
 linkedyear = function (date, name) {
 	
+	var totexp = '0';
 		db2.transaction (function (transaction) 
   { 
   	var param1 = new Date();
@@ -1263,7 +1274,7 @@ linkedyear = function (date, name) {
 		  var restime = row.time;
 		  var resid = row.id;
 
-		  
+		  totexp = parseInt(totexp) + parseInt(row.amount);
           html += "<li id=\""+ resid +"\" data-name=\"" +resid+"\" > <a> <h3>" +rescat+ "</h3> <h4>Rs. "+ resamount+ " by "+ respaymode+ "</h4><p>" +  resremark + "</p> <p class=\"ui-li-aside\"> "+resdate+"/" +resmonth+"/" +resyear+"</p></a>" + 
 		  " <a href=\"#delete_item\" data-rel=\"popup\" data-position-to=\"window\" data-transition=\"pop\" id = \"" +resid+ "\">Purchase album</a></li>";
         }
@@ -1271,13 +1282,15 @@ linkedyear = function (date, name) {
       else
       {
         html += "<li> No Expenses</li>";
+		$('#totalyearexpenses').text(' Total Expenses Rs. 0');
       }
       
 	// alert (html);
 	  $('#year_list').empty();
+	   $('#totalyearexpenses').text(' Total Expenses Rs. ' + totexp);
 		 $('#year_list').append(html).listview('refresh');
 		 html="";
-        
+        totexp = '0';
     });
 	 
   })
